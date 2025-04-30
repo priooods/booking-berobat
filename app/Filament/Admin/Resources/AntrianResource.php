@@ -47,7 +47,7 @@ class AntrianResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(TAntrian::with('schedule_docter')->orderBy('antrian', 'asc'))
+            ->query(TAntrian::with('schedule_docter')->where('m_statuses_id', '>', 1)->orderBy('antrian', 'asc'))
             ->columns([
                 TextColumn::make('antrian')->label('Nomor Antrian')
                     ->getStateUsing(function ($record) {
