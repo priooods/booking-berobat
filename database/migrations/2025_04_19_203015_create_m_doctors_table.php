@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('m_doctors', function (Blueprint $table) {
             $table->integerIncrements('id');
             $table->string('name');
-            $table->time('doctor_schedule');
+            $table->tinyInteger('is_active')->default(1)->comment('1 = active, 0 = tidak active');
             $table->timestamps();
         });
     }

@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('m_polis', function (Blueprint $table) {
-            $table->integerIncrements('id');
-            $table->string('title');
+        Schema::create('t_doctor_periodes', function (Blueprint $table) {
+            $table->id();
+            $table->date('periode');
+            $table->tinyInteger('is_active');
+            $table->timestamps();
         });
     }
 
@@ -22,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('m_polis');
+        Schema::dropIfExists('t_doctor_periodes');
     }
 };

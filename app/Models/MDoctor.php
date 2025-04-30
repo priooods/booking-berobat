@@ -8,6 +8,11 @@ class MDoctor extends Model
 {
     protected $fillable = [
         'name',
-        'doctor_schedule',
+        'is_active'
     ];
+
+    public function schedules()
+    {
+        return $this->hasMany(TDoctorSchedule::class, 'm_doctors_id');
+    }
 }

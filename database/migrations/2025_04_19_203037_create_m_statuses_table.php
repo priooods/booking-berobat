@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('m_polis', function (Blueprint $table) {
-            $table->integerIncrements('id');
+        Schema::create('m_statuses', function (Blueprint $table) {
+            $table->smallIncrements('id');
             $table->string('title');
         });
     }
@@ -22,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('m_polis');
+        Schema::dropIfExists('m_statuses');
     }
 };

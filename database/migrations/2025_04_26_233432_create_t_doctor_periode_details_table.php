@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('m_polis', function (Blueprint $table) {
-            $table->integerIncrements('id');
-            $table->string('title');
+        Schema::create('t_doctor_periode_details', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('t_doctor_periodes_id');
+            $table->unsignedInteger('m_doctors_id');
         });
     }
 
@@ -22,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('m_polis');
+        Schema::dropIfExists('t_doctor_periode_details');
     }
 };

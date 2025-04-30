@@ -12,6 +12,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -28,14 +29,7 @@ class PoliResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('title')->label('Nama Poli'),
-                Select::make('m_doctors_id')
-                    ->multiple()
-                    ->label('Author')
-                    ->placeholder('Cari nama dokter')
-                    ->searchable()
-                    ->getSearchResultsUsing(fn(string $search): array => MDoctor::where('name', 'like', "%{$search}%")->limit(5)->pluck('name', 'id')->toArray())
-                    ->getOptionLabelUsing(fn($value): ?string => MDoctor::find($value)?->name),
+            TextInput::make('title')->label('Nama Poli')->placeholder('Masukan Nama Poli'),
             ]);
     }
 
@@ -43,7 +37,7 @@ class PoliResource extends Resource
     {
         return $table
             ->columns([
-                //
+            TextColumn::make('title')->label('Nama Poli')
             ])
             ->filters([
                 //
@@ -52,7 +46,7 @@ class PoliResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
+            Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);

@@ -13,16 +13,20 @@ return new class extends Migration
     {
         Schema::create('t_antrians', function (Blueprint $table) {
             $table->id();
-            $table->string('code');
+            $table->unsignedSmallInteger('m_statuses_id');
+            $table->integer('antrian');
             $table->string('number_ktp');
             $table->string('name');
             $table->unsignedBigInteger('user_id');
-            $table->unsignedInteger('m_doctors_id');
             $table->unsignedInteger('m_polis_id');
             $table->char('gender', 1);
             $table->date('birthday');
             $table->string('phone');
             $table->string('address');
+            $table->string('diagnosa');
+            $table->date('date_treatment');
+            $table->tinyInteger('payment')->comment('0 = cash, 1 = bpjs');
+            $table->string('no_bpjs')->nullable();
             $table->timestamps();
         });
     }

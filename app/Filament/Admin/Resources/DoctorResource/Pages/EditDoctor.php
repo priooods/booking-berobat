@@ -9,7 +9,7 @@ use Filament\Resources\Pages\EditRecord;
 class EditDoctor extends EditRecord
 {
     protected static string $resource = DoctorResource::class;
-
+    protected ?string $heading = 'Ubah Dokter';
     protected function getHeaderActions(): array
     {
         return [

@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\LoginPage;
+use App\Livewire\AntrianForm;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -28,8 +29,10 @@ class UserPanelProvider extends PanelProvider
             ->id('user')
             ->path('puskesmas')
             ->brandName('PUSKESMAS PETIR')
-            ->login(LoginPage::class)
+            ->login()
             ->registration()
+            ->passwordReset()
+            ->emailVerification()
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -41,7 +44,7 @@ class UserPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+            Widgets\FilamentInfoWidget::class
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -56,6 +59,7 @@ class UserPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->authGuard('web');
     }
 }

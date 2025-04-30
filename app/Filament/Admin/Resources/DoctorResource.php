@@ -3,17 +3,19 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\DoctorResource\Pages;
-use App\Filament\Admin\Resources\DoctorResource\RelationManagers;
 use App\Models\MDoctor;
-use Filament\Forms;
+use App\Models\MPoli;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class DoctorResource extends Resource
 {
@@ -27,8 +29,18 @@ class DoctorResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')->label('Nama Dokter'),
-                TimePicker::make('doctor_schedule')->label('Waktu Jaga'),
+            TextInput::make('name')->label('Nama Dokter')->placeholder('Masukan nama dokter')->required(),
+            Select::make('is_active')
+                ->label('Status Dokter')
+                ->placeholder('Pilih Status')
+                ->options([
+                    1 => 'Aktif',
+                    0 => 'Tidak Aktif',
+                ])
+                ->native(false)
+                ->searchable()
+                ->default(1)
+                ->required()
             ]);
     }
 
@@ -36,7 +48,13 @@ class DoctorResource extends Resource
     {
         return $table
             ->columns([
-                //
+            TextColumn::make('name')->label('Nama Dokter'),
+            TextColumn::make('is_active')->label('Status Dokter')->badge()->color(fn(string $state): string => match ($state) {
+                '0' => 'danger',
+                '1' => 'success',
+            })->formatStateUsing(function ($state) {
+                return $state == 1 ? 'Aktif' : 'Tidak Aktif';
+            }),
             ])
             ->filters([
                 //

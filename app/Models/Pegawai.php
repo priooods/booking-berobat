@@ -9,5 +9,10 @@ use Illuminate\Notifications\Notifiable;
 class Pegawai extends Authenticatable
 {
     use HasFactory, Notifiable;
-    //
+
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
 }
