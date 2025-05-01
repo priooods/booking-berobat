@@ -7,6 +7,7 @@ use App\Models\TAntrian;
 use App\Models\TDoctorSchedule;
 use Carbon\Carbon;
 use Filament\Actions\StaticAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
@@ -16,7 +17,11 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\QueryBuilder;
+use Filament\Tables\Filters\QueryBuilder\Constraints\SelectConstraint;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class AntrianResource extends Resource
 {
@@ -47,7 +52,7 @@ class AntrianResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(TAntrian::with('schedule_docter')->where('m_statuses_id', '>', 1)->orderBy('antrian', 'asc'))
+            ->query(TAntrian::with('schedule_docter')->where('m_statuses_id', '>', 1)->orderBy('date_treatment', 'asc')->orderBy('m_statuses_id', 'asc')->orderBy('antrian', 'asc'))
             ->columns([
                 TextColumn::make('antrian')->label('Nomor Antrian')
                     ->getStateUsing(function ($record) {
@@ -86,8 +91,28 @@ class AntrianResource extends Resource
                     ->getStateUsing(fn($record) => $record->status ? $record->status->title : 'Tidak Ada'),
             ])
             ->filters([
-                //
+            Filter::make('date_treatment')
+                ->form([
+                    DatePicker::make('start_date')->label('Dari Tanggal'),
+                    DatePicker::make('start_end')->label('Sampai Tanggal'),
+                ])
+                ->query(function (Builder $query, array $data): Builder {
+                    return $query
+                        ->when(
+                            $data['start_date'],
+                            fn(Builder $query, $date): Builder => $query->whereDate('date_treatment', '>=', $date),
+                        )
+                        ->when(
+                            $data['start_end'],
+                            fn(Builder $query, $date): Builder => $query->whereDate('date_treatment', '<=', $date),
+                        );
+                })
             ])
+            ->filtersTriggerAction(
+                fn(Action $action) => $action
+                    ->button()
+                    ->label('Filter'),
+            )
             ->actions([
             ActionGroup::make([
                 Action::make('sedang_berobat')

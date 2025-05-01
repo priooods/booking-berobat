@@ -23,6 +23,16 @@ class TAntrian extends Model
         'no_bpjs'
     ];
 
+    public function mydoctor()
+    {
+        return $this->hasOne(TDoctorSchedule::class, 'doctor_schedule_dates', 'date_treatment')->where('m_polis_id', $this->m_polis_id);
+    }
+
+    public function antrian_now()
+    {
+        return $this->hasOne(TAntrian::class, 'date_treatment', 'date_treatment')->where('m_statuses_id', 3)->orderBy('antrian', 'desc');
+    }
+
     public function schedule_docter()
     {
         return $this->hasOne(TDoctorSchedule::class, 'doctor_schedule_dates', 'date_treatment');
