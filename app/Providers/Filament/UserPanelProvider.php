@@ -2,13 +2,17 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Beranda;
+use App\Filament\Pages\EmailVerif;
 use App\Filament\Pages\LoginPage;
 use App\Livewire\AntrianForm;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
+use Filament\Pages\Auth\EditProfile;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -32,14 +36,22 @@ class UserPanelProvider extends PanelProvider
             ->login()
             ->registration()
             ->passwordReset()
+            ->profile()
             ->emailVerification()
             ->colors([
                 'primary' => Color::Amber,
             ])
+            // ->navigationItems([
+            //     NavigationItem::make('Profile')
+            //         ->label(fn(): string => __('filament-panels::pages/auth/edit-profile.label'))
+            //         ->url(fn() => EditProfile::getUrl())
+            //         ->icon('heroicon-o-user-circle')
+            //         ->isActiveWhen(fn(): bool => request()->routeIs(EditProfile::getRouteName())),
+            // ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+            Beranda::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
