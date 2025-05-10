@@ -32,22 +32,16 @@ class UserPanelProvider extends PanelProvider
             ->default()
             ->id('user')
             ->path('puskesmas')
-            ->brandName('PUSKESMAS PETIR')
             ->login()
+            ->brandLogo(fn() => view('filament.logo'))
+            ->brandLogoHeight('3rem')
             ->registration()
             ->passwordReset()
             ->profile()
             ->emailVerification()
             ->colors([
                 'primary' => Color::Amber,
-            ])
-            // ->navigationItems([
-            //     NavigationItem::make('Profile')
-            //         ->label(fn(): string => __('filament-panels::pages/auth/edit-profile.label'))
-            //         ->url(fn() => EditProfile::getUrl())
-            //         ->icon('heroicon-o-user-circle')
-            //         ->isActiveWhen(fn(): bool => request()->routeIs(EditProfile::getRouteName())),
-            // ])
+        ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([

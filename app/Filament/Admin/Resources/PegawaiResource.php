@@ -6,6 +6,7 @@ use App\Filament\Admin\Resources\PegawaiResource\Pages;
 use App\Filament\Admin\Resources\PegawaiResource\RelationManagers;
 use App\Models\Pegawai;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
@@ -25,6 +26,14 @@ class PegawaiResource extends Resource
     protected static ?string $navigationLabel = 'Pegawai';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        if (isset(auth()->user()->role))
+            if (auth()->user()->role === 1) return false;
+            else return true;
+        return false;
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -32,7 +41,18 @@ class PegawaiResource extends Resource
                 function (Page $livewire) {
                     $fields = [
                         TextInput::make('name')->label('Nama Pegawai')->placeholder('Masukan nama Pegawai')->required(),
-                        TextInput::make('email')->label('Email Akun')->placeholder('Masukan Email')->required()
+                    TextInput::make('email')->label('Email Akun')->placeholder('Masukan Email')->required(),
+                    Select::make('role')
+                        ->label('Akses Pegawai')
+                        ->placeholder('Pilih Akses')
+                        ->options([
+                            1 => 'Bag. Pendaftaran',
+                            2 => 'Admin',
+                        ])
+                        ->native(false)
+                        ->searchable()
+                        ->default(1)
+                        ->required()
                     ];
 
                     if ($livewire instanceof CreateRecord) {
@@ -60,6 +80,12 @@ class PegawaiResource extends Resource
             ->columns([
             TextColumn::make('name')->label('Nama Pegawai'),
             TextColumn::make('email')->label('Email Pegawai'),
+            TextColumn::make('role')->label('Akses')->badge()->color(fn(string $state): string => match ($state) {
+                '1' => 'danger',
+                '2' => 'success',
+            })->formatStateUsing(function ($state) {
+                return $state == 1 ? 'Bag. Pendaftaran' : 'Admin';
+            }),
             ])
             ->filters([
                 //

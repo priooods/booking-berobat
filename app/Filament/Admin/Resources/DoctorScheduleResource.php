@@ -33,6 +33,14 @@ class DoctorScheduleResource extends Resource
     protected static ?string $breadcrumb = "Periode Jaga";
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        if (isset(auth()->user()->role))
+            if (auth()->user()->role === 1) return false;
+            else return true;
+        return false;
+    }
+
     public static function form(Form $form): Form
     {
         return $form
