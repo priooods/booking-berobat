@@ -139,6 +139,10 @@ class AntrianResource extends Resource
                                 'm_statuses_id' => 2,
                                 'antrian' => ((int)$find['antrian'] + 1),
                             ]);
+                    } else {
+                        $record->update([
+                            'm_statuses_id' => 2,
+                        ]);
                         }
                     })
                     ->visible(fn($record) => $record->m_statuses_id === 1)

@@ -3,11 +3,16 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\AntrianResource\Pages;
+use App\Models\MPoli;
 use App\Models\TAntrian;
 use App\Models\TDoctorSchedule;
 use Carbon\Carbon;
 use Filament\Actions\StaticAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
@@ -34,7 +39,55 @@ class AntrianResource extends Resource
     {
         return $form
             ->schema([
-                //
+            TextInput::make('number_ktp')->label('No KTP')->placeholder('Masukan No KTP')->numeric()->required(),
+            TextInput::make('name')->label('Nama Pasien')->placeholder('Masukan Nama Lengkap Pasien')->required(),
+            DatePicker::make('birthday')
+                ->label('Tanggal Lahir')
+                ->placeholder('Masukan Tanggal Lahir')->required()
+                ->native(false),
+            Select::make('gender')
+                ->label('Jenis Kelamin')->required()
+                ->placeholder('Pilih Jenis Kelamin')
+                ->options([
+                    0 => 'Wanita',
+                    1 => 'Pria'
+                ]),
+            TextInput::make('phone')
+                ->label('No Handphone')
+                ->placeholder('Gunakan awalan 08')
+                ->numeric()->required(),
+            Textarea::make('address')->label('Alamat')->placeholder('Masukan Alamat Lengkap')->autosize()->required(),
+            Section::make('Detail Berobat')->schema([
+                Textarea::make('diagnosa')->label('Detail Keluhan Sakit')->placeholder('Masukan Keluhan Sakit')->autosize()->required(),
+                Select::make('m_polis_id')
+                    ->label('Pilih Poli')
+                    ->relationship('polis', 'title')
+                    ->placeholder('Cari nama Poli')
+                    ->options(MPoli::all()->pluck('title', 'id'))
+                    ->searchable()
+                    ->required()
+                    ->getSearchResultsUsing(fn(string $search): array => MPoli::where('title', 'like', "%{$search}%")->limit(5)->pluck('title', 'id')->toArray())
+                    ->getOptionLabelUsing(fn($value): ?string => MPoli::find($value)?->title),
+                DatePicker::make('date_treatment')
+                    ->label('Tanggal & Jam Berobat')
+                    ->placeholder('Masukan Tanggal & Jam Berobat')
+                    ->native(false)->required(),
+                Select::make('payment')
+                    ->label('Jenis Pembayaran')
+                    ->placeholder('Pilih Jenis Pembayaran')
+                    ->options([
+                        '0' => 'Cash',
+                        '1' => 'BPJS'
+                    ])
+                    ->required()
+                    ->live(onBlur: true),
+                TextInput::make('no_bpjs')
+                    ->numeric()
+                    ->label('No BPJS')
+                    ->placeholder('Masukan No BPJS')
+                    ->visible(fn($get) => $get('payment') === '1')
+                    ->required(fn($get) => $get('payment') === '1')
+            ])
             ]);
     }
 
@@ -52,7 +105,28 @@ class AntrianResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(TAntrian::with('schedule_docter')->where('m_statuses_id', '>', 1)->orderBy('date_treatment', 'asc')->orderBy('m_statuses_id', 'asc')->orderBy('antrian', 'asc'))
+            ->query(
+                function () {
+                    if (auth()->user()->role == 2) {
+                        return TAntrian::with('schedule_docter')
+                            ->orderBy('date_treatment', 'asc')
+                            ->orderBy('m_statuses_id', 'asc')
+                            ->orderBy('antrian', 'asc');
+                    } else if (auth()->user()->role == 1) {
+                        return TAntrian::with('schedule_docter')
+                            ->whereIn('m_statuses_id', [1, 2])
+                            ->orderBy('date_treatment', 'asc')
+                            ->orderBy('m_statuses_id', 'asc')
+                            ->orderBy('antrian', 'asc');
+                    } else {
+                        return TAntrian::with('schedule_docter')
+                            ->where('m_statuses_id', 3)
+                            ->orderBy('date_treatment', 'asc')
+                            ->orderBy('m_statuses_id', 'asc')
+                            ->orderBy('antrian', 'asc');
+                    }
+                }
+            )
             ->columns([
                 TextColumn::make('antrian')->label('Nomor Antrian')
                     ->getStateUsing(function ($record) {
@@ -130,14 +204,54 @@ class AntrianResource extends Resource
                     ->modalDescription('Apakah Pasien sudah diperbolehkan bertemu dokter ?')
                     ->modalSubmitActionLabel('Konfirmasi')
                     ->modalCancelAction(fn(StaticAction $action) => $action->label('Batal')),
-                    DeleteAction::make()
-                        ->visible(fn($record) => $record->m_statuses_id === 1)
-                        ->requiresConfirmation()
-                        ->action(fn(TAntrian $record) => $record->delete())
-                        ->modalHeading('Hapus Data'),
-                    Tables\Actions\ViewAction::make()->modalHeading('Detail Informasi Antrian')
-                ])->button()
-                    ->label('Aksi')->color('info')
+                Action::make('selesai_berobat')
+                    ->label('Selesai Berobat')
+                    ->action(function ($record) {
+                        $record->update([
+                            'm_statuses_id' => 4,
+                        ]);
+                    })
+                    ->visible(fn($record) => $record->m_statuses_id === 3 && auth()->user()->role === 3)
+                    ->icon('heroicon-o-check')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Konfirmasi Selesai Berobat')
+                    ->modalDescription('Apakah Pasien sudah Selesai Berobat ?')
+                    ->modalSubmitActionLabel('Konfirmasi')
+                    ->modalCancelAction(fn(StaticAction $action) => $action->label('Batal')),
+                Action::make('konfirmasi')
+                    ->label('Konfirmasi')
+                    ->action(function ($record) {
+                        $find = TAntrian::where('m_statuses_id', '!=', 1)
+                            ->where('date_treatment', $record['date_treatment'])
+                            ->orderBy('antrian', 'desc')
+                            ->first();
+                        if (isset($find)) {
+                            $record->update([
+                                'm_statuses_id' => 2,
+                                'antrian' => ((int)$find['antrian'] + 1),
+                            ]);
+                        } else {
+                            $record->update([
+                                'm_statuses_id' => 2,
+                            ]);
+                        }
+                    })
+                    ->visible(fn($record) => $record->m_statuses_id === 1)
+                    ->icon('heroicon-o-check')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Konfirmasi Pengajuan Berobat')
+                    ->modalDescription('Apakah anda yakin ingin mengirim pengajuan berobat ?')
+                    ->modalSubmitActionLabel('Konfirmasi')
+                    ->modalCancelAction(fn(StaticAction $action) => $action->label('Batal')),
+                DeleteAction::make()
+                    ->visible(fn($record) => $record->m_statuses_id === 1)
+                    ->requiresConfirmation()
+                    ->action(fn(TAntrian $record) => $record->delete())
+                    ->modalHeading('Hapus Data'),
+                Tables\Actions\ViewAction::make()->modalHeading('Detail Informasi Antrian')
+            ])->button()->label('Aksi')->color('info')
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

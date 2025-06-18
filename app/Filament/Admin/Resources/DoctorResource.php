@@ -28,8 +28,7 @@ class DoctorResource extends Resource
     public static function shouldRegisterNavigation(): bool
     {
         if (isset(auth()->user()->role))
-            if (auth()->user()->role === 1) return false;
-            else return true;
+            if (auth()->user()->role === 2) return true;
         return false;
     }
 

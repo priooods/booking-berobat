@@ -29,8 +29,7 @@ class PegawaiResource extends Resource
     public static function shouldRegisterNavigation(): bool
     {
         if (isset(auth()->user()->role))
-            if (auth()->user()->role === 1) return false;
-            else return true;
+            if (auth()->user()->role === 2) return true;
         return false;
     }
 
@@ -48,6 +47,7 @@ class PegawaiResource extends Resource
                         ->options([
                             1 => 'Bag. Pendaftaran',
                             2 => 'Admin',
+                        3 => 'Petugas',
                         ])
                         ->native(false)
                         ->searchable()
