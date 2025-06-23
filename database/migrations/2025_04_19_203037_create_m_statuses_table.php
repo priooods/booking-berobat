@@ -15,6 +15,17 @@ return new class extends Migration
             $table->smallIncrements('id');
             $table->string('title');
         });
+
+        DB::table('m_status_tabs')->insert(
+            array(
+                ['title' => 'DRAFT'],
+                ['title' => 'DI AJUKAN'],
+                ['title' => 'SEDANG BEROBAT'],
+                ['title' => 'SELESAI BEROBAT'],
+                ['title' => 'DI BATALKAN'],
+                ['title' => 'DI TOLAK']
+            )
+        );
     }
 
     /**
