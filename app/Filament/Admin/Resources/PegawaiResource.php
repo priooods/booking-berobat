@@ -83,6 +83,7 @@ class PegawaiResource extends Resource
             TextColumn::make('role')->label('Akses')->badge()->color(fn(string $state): string => match ($state) {
                 '1' => 'danger',
                 '2' => 'success',
+                '3' => 'info',
             })->formatStateUsing(function ($state) {
                 return $state == 1 ? 'Bag. Pendaftaran' : 'Admin';
             }),
