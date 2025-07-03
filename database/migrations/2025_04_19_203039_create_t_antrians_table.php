@@ -22,6 +22,7 @@ return new class extends Migration
             $table->char('gender', 1);
             $table->date('birthday');
             $table->string('phone');
+            $table->string('blode');
             $table->string('address');
             $table->string('diagnosa');
             $table->date('date_treatment');

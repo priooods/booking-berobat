@@ -20,7 +20,8 @@ class TAntrian extends Model
         'date_treatment',
         'payment',
         'm_statuses_id',
-        'no_bpjs'
+        'no_bpjs',
+        'blode'
     ];
 
     public function mydoctor()

@@ -43,13 +43,23 @@ class AntrianResource extends Resource
                     ->label('Tanggal Lahir')
                 ->placeholder('Masukan Tanggal Lahir')->required()
                 ->native(false),
-                Select::make('gender')
+            Select::make('gender')
                 ->label('Jenis Kelamin')->required()
                 ->placeholder('Pilih Jenis Kelamin')
                     ->options([
                         0 => 'Wanita',
                         1 => 'Pria'
                     ]),
+            Select::make('blode')
+                ->label('Gol Darah')->required()
+                ->placeholder('Pilih Gol Darah')
+                ->options([
+                    'A' => 'A',
+                    'B' => 'B',
+                    'AB' => 'AB',
+                    'O' => 'O',
+                    'Tidak Tahu' => 'Tidak Tahu',
+                ]),
                 TextInput::make('phone')
                     ->label('No Handphone')
                 ->placeholder('Gunakan awalan 08')

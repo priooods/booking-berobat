@@ -51,6 +51,16 @@ class AntrianResource extends Resource
                     0 => 'Wanita',
                     1 => 'Pria'
                 ]),
+            Select::make('blode')
+                ->label('Gol Darah')->required()
+                ->placeholder('Pilih Gol Darah')
+                ->options([
+                    'A' => 'A',
+                    'B' => 'B',
+                    'AB' => 'AB',
+                    'O' => 'O',
+                    'Tidak Tahu' => 'Tidak Tahu',
+                ]),
             TextInput::make('phone')
                 ->label('No Handphone')
                 ->placeholder('Gunakan awalan 08')
