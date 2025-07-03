@@ -23,10 +23,9 @@ use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\QueryBuilder;
-use Filament\Tables\Filters\QueryBuilder\Constraints\SelectConstraint;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class AntrianResource extends Resource
 {
@@ -105,16 +104,17 @@ class AntrianResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->searchable()
             ->query(
                 function () {
                     if (auth()->user()->role == 2) {
-                        return TAntrian::with('schedule_docter')
+                    return TAntrian::whereIn('m_statuses_id', [2, 3, 4, 6])->with('schedule_docter')
                             ->orderBy('date_treatment', 'asc')
                             ->orderBy('m_statuses_id', 'asc')
                             ->orderBy('antrian', 'asc');
                     } else if (auth()->user()->role == 1) {
                         return TAntrian::with('schedule_docter')
-                            ->whereIn('m_statuses_id', [1, 2])
+                        ->where('m_statuses_id', 2)
                             ->orderBy('date_treatment', 'asc')
                             ->orderBy('m_statuses_id', 'asc')
                             ->orderBy('antrian', 'asc');
@@ -132,7 +132,7 @@ class AntrianResource extends Resource
                     ->getStateUsing(function ($record) {
                         return $record->m_statuses_id == 1 ? 'Belum Ada' : $record->antrian;
                     }),
-                TextColumn::make('name')->label('Nama Pasien'),
+            TextColumn::make('name')->label('Nama Pasien')->searchable(),
                 TextColumn::make('date_treatment')->label('Waktu Berobat')
                     ->formatStateUsing(fn($state) => Carbon::parse($state)->format('d F Y')),
                 TextColumn::make('m_polis_id')->label('Poli')
@@ -255,8 +255,22 @@ class AntrianResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                ExportBulkAction::make()
+                // ->fromTable()
+                // ->withFilename(date('Y-m-d') . ' - export')
+                // ->withWriterType(\Maatwebsite\Excel\Excel::XLSX)
+                // ->withColumns([
+                //     Column::make('antrian')->heading('Antrian'),
+                //     Column::make('number_ktp')->heading('NIK'),
+                //     Column::make('name')->heading('Nama Pasien'),
+                //     Column::make('phone')->heading('No HP'),
+                //     Column::make('diagnosa')->heading('Diagnosa'),
+                //     Column::make('date_treatment')->heading('Tgl Berobat')->formatStateUsing(fn($state) => Carbon::parse($state)->format('d F Y')),
+                //     Column::make('gender')->heading('Jenis Kelamin')->formatStateUsing(
+                //         fn($state) => $state == 1 ? 'L' : 'P'
+                //     ),
+                // ]),
+            ]),
             ]);
     }
 
