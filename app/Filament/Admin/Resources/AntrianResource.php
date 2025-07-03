@@ -14,6 +14,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Group;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -260,7 +261,62 @@ class AntrianResource extends Resource
                     ->requiresConfirmation()
                     ->action(fn(TAntrian $record) => $record->delete())
                     ->modalHeading('Hapus Data'),
-                Tables\Actions\ViewAction::make()->modalHeading('Detail Informasi Antrian')
+                Tables\Actions\ViewAction::make()
+                    ->form([
+                        Section::make('Antrian Anda')->columns(2)->schema([
+                            Group::make([
+                                TextInput::make('antrian')->label('Antrian Saat Ini')->readOnly()
+                            ])->relationship('antrian_now'),
+                            TextInput::make('antrian')->label('Nomor Antrian Anda')->readOnly(),
+                            Group::make([
+                                Group::make([
+                                    Group::make([
+                                        TextInput::make('name')->label('Dokter Jaga')->readOnly()
+                                    ])->relationship('doctor')
+                                ])->relationship('periode')
+                            ])->relationship('mydoctor'),
+                            Group::make([
+                                TextInput::make('title')->label('Status Antrian')->readOnly()
+                            ])->relationship('status')
+                        ]),
+                        Section::make('Informasi Pasien')->columns(2)->schema([
+                            TextInput::make('number_ktp')->label('Nomor KTP')->readOnly(),
+                            TextInput::make('name')->label('Nama Pasien')->readOnly(),
+                            Select::make('gender')
+                                ->label('Jenis Kelamin')->required()
+                                ->placeholder('Pilih Jenis Kelamin')
+                                ->options([
+                                    0 => 'Wanita',
+                                    1 => 'Pria'
+                                ]),
+                            TextInput::make('birthday')->label('Tgl lahir Pasien')->readOnly(),
+                            TextInput::make('phone')->label('No. Handphone')->readOnly(),
+                            Textarea::make('address')->label('Alamat')->readOnly(),
+                        ]),
+                        Section::make('Informasi Berobat')->columns(2)->schema([
+                            Textarea::make('diagnosa')->label('Keluhan Sakit')->readOnly(),
+                            DatePicker::make('date_treatment')
+                                ->label('Tanggal & Jam Berobat')
+                                ->placeholder('Masukan Tanggal & Jam Berobat')
+                                ->native(false),
+                            Select::make('m_polis_id')
+                                ->label('Pilih Poli')
+                                ->relationship('polis', 'title')
+                                ->placeholder('Cari nama Poli')
+                                ->options(MPoli::all()->pluck('title', 'id'))
+                                ->searchable()
+                                ->getSearchResultsUsing(fn(string $search): array => MPoli::where('title', 'like', "%{$search}%")->limit(5)->pluck('title', 'id')->toArray())
+                                ->getOptionLabelUsing(fn($value): ?string => MPoli::find($value)?->title),
+                            Select::make('payment')
+                                ->label('Jenis Pembayaran')
+                                ->placeholder('Pilih Jenis Pembayaran')
+                                ->options([
+                                    '0' => 'Cash',
+                                    '1' => 'BPJS'
+                                ])
+                        ])
+                    ])
+                    ->modalHeading('Detail Informasi Antrian')
             ])->button()->label('Aksi')->color('info')
             ])
             ->bulkActions([
