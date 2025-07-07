@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\AntrianResource\Pages;
 use App\Models\MPoli;
 use App\Models\TAntrian;
+use App\Models\TReviewTab;
 use Carbon\Carbon;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\Action;
@@ -20,10 +21,13 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Lartisan\RatingTool\Forms\Components\RatingInput;
+use Lartisan\RatingTool\Tables\Columns\RatingColumn;
 
 class AntrianResource extends Resource
 {
@@ -131,6 +135,12 @@ class AntrianResource extends Resource
                 'DI TOLAK' => 'danger',
             })
                 ->getStateUsing(fn($record) => $record->status ? $record->status->title : 'Tidak Ada'),
+            RatingColumn::make('myrating')
+                ->size('xs')
+                ->label('Rating')
+                ->icon('heroicon-s-star')
+                ->getStateUsing(fn($record) => $record->myrating ? $record->myrating->start : 0)
+                ->color('warning'),
             ])
             ->filters([
                 //
@@ -162,6 +172,31 @@ class AntrianResource extends Resource
                     ->modalHeading('Konfirmasi Pengajuan Berobat')
                     ->modalDescription('Apakah anda yakin ingin mengirim pengajuan berobat ?')
                     ->modalSubmitActionLabel('Konfirmasi')
+                    ->modalCancelAction(fn(StaticAction $action) => $action->label('Batal')),
+                Action::make('ratings')
+                    ->label('Beri Rating')
+                    ->form([
+                        RatingInput::make('rating')->maxValue(5)->size('xl')->icon('heroicon-o-star')->color('warning'),
+                        Textarea::make('description')->label('Deskripsi')->placeholder('Masukan Penilaian anda')
+                    ])
+                    ->action(function (array $data, TAntrian $record) {
+                        if (!isset($data['description']))
+                            return;
+                        else {
+                            TReviewTab::create([
+                                'users_id' => auth()->user()->id,
+                                'start' => $data['rating'],
+                                'description' => $data['description'],
+                                't_antrian_tabs_id' => $record->id,
+                            ]);
+                        }
+                    })
+                    ->visible(fn($record) => $record->m_statuses_id === 4 && !isset($record->myrating->start))
+                    ->icon('heroicon-o-check')
+                    ->color('success')
+                    ->modalWidth(MaxWidth::Small)
+                    ->modalHeading('Rating untuk Pelayanan Puskesmas')
+                    ->modalSubmitActionLabel('Beri Rating')
                     ->modalCancelAction(fn(StaticAction $action) => $action->label('Batal')),
                 Tables\Actions\EditAction::make()->visible(fn($record) => $record->m_statuses_id === 1),
                 Tables\Actions\ViewAction::make()

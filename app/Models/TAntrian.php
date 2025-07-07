@@ -29,6 +29,11 @@ class TAntrian extends Model
         return $this->hasOne(TDoctorSchedule::class, 'doctor_schedule_dates', 'date_treatment')->where('m_polis_id', $this->m_polis_id);
     }
 
+    public function myrating()
+    {
+        return $this->hasOne(TReviewTab::class, 't_antrian_tabs_id', 'id')->where('users_id', auth()->user()->id);
+    }
+
     public function antrian_now()
     {
         return $this->hasOne(TAntrian::class, 'date_treatment', 'date_treatment')->where('m_statuses_id', 3)->orderBy('antrian', 'desc');

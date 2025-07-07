@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2a7d36cba9aa1f13637711fa9a25b0c5",
+    "content-hash": "4146772a0041ec8afb525aab973b8501",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -2645,6 +2645,87 @@
                 "source": "https://github.com/laravel/tinker/tree/v2.10.1"
             },
             "time": "2025-01-27T14:24:01+00:00"
+        },
+        {
+            "name": "lartisan/filament-rating-tool",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lartisan/filament-rating-tool.git",
+                "reference": "8f99d63d4d52fe896cbbd90a33b58a6504b7cc5f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lartisan/filament-rating-tool/zipball/8f99d63d4d52fe896cbbd90a33b58a6504b7cc5f",
+                "reference": "8f99d63d4d52fe896cbbd90a33b58a6504b7cc5f",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^3.3",
+                "illuminate/contracts": "^9.28|^10.0|^11.0|^12.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.20"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^7.9",
+                "nunomaduro/larastan": "^2.0.1",
+                "orchestra/testbench": "^8.0",
+                "pestphp/pest": "^2.1|^3.1",
+                "pestphp/pest-plugin-arch": "^2.0",
+                "pestphp/pest-plugin-laravel": "^2.0",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^1.0",
+                "phpstan/phpstan-phpunit": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "RatingTool": "Lartisan\\RatingTool\\Facades\\RatingTool"
+                    },
+                    "providers": [
+                        "Lartisan\\RatingTool\\RatingToolServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Lartisan\\RatingTool\\": "src/",
+                    "Lartisan\\RatingTool\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Cristian Iosif",
+                    "email": "hello@filamentcomponents.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Rating Tool is a FilamentPHP plugin meant to provide a set of tools for measuring or rating different resources of your app.",
+            "homepage": "https://github.com/lartisan/filament-rating-tool",
+            "keywords": [
+                "filament plugin",
+                "filament text column",
+                "filament text entry",
+                "filament text input",
+                "filament-rating-tool"
+            ],
+            "support": {
+                "issues": "https://github.com/lartisan/filament-rating-tool/issues",
+                "source": "https://github.com/lartisan/filament-rating-tool"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/lartisan",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-03-23T19:17:14+00:00"
         },
         {
             "name": "league/commonmark",

@@ -15,6 +15,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Group;
+use Filament\Infolists\Components\Section as ComponentsSection;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -26,6 +27,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Lartisan\RatingTool\Tables\Columns\RatingColumn;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class AntrianResource extends Resource
@@ -174,6 +176,12 @@ class AntrianResource extends Resource
                     'DI TOLAK' => 'danger',
                 })
                     ->getStateUsing(fn($record) => $record->status ? $record->status->title : 'Tidak Ada'),
+            RatingColumn::make('myrating')
+                ->size('xs')
+                ->label('Rating')
+                ->icon('heroicon-s-star')
+                ->getStateUsing(fn($record) => $record->myrating ? $record->myrating->start : 0)
+                ->color('warning'),
             ])
             ->filters([
             Filter::make('date_treatment')
@@ -263,7 +271,7 @@ class AntrianResource extends Resource
                     ->modalHeading('Hapus Data'),
                 Tables\Actions\ViewAction::make()
                     ->form([
-                        Section::make('Antrian Anda')->columns(2)->schema([
+                    ComponentsSection::make('Antrian Anda')->columns(2)->schema([
                             Group::make([
                                 TextInput::make('antrian')->label('Antrian Saat Ini')->readOnly()
                             ])->relationship('antrian_now'),
@@ -279,7 +287,7 @@ class AntrianResource extends Resource
                                 TextInput::make('title')->label('Status Antrian')->readOnly()
                             ])->relationship('status')
                         ]),
-                        Section::make('Informasi Pasien')->columns(2)->schema([
+                    ComponentsSection::make('Informasi Pasien')->columns(2)->schema([
                             TextInput::make('number_ktp')->label('Nomor KTP')->readOnly(),
                             TextInput::make('name')->label('Nama Pasien')->readOnly(),
                             Select::make('gender')
@@ -293,7 +301,7 @@ class AntrianResource extends Resource
                             TextInput::make('phone')->label('No. Handphone')->readOnly(),
                             Textarea::make('address')->label('Alamat')->readOnly(),
                         ]),
-                        Section::make('Informasi Berobat')->columns(2)->schema([
+                    ComponentsSection::make('Informasi Berobat')->columns(2)->schema([
                             Textarea::make('diagnosa')->label('Keluhan Sakit')->readOnly(),
                             DatePicker::make('date_treatment')
                                 ->label('Tanggal & Jam Berobat')
